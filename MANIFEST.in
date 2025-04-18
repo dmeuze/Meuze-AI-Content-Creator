@@ -1,0 +1,7 @@
+include README.md
+include LICENSE
+include .env.example
+include .flaskenv
+recursive-include tmz_content_creator/templates *
+recursive-include tmz_content_creator/static *
+recursive-include tmz_content_creator/config * 
