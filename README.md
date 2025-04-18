@@ -137,7 +137,6 @@ flake8
 tmz_content_creator/
 ├── __init__.py
 ├── config/
-│   ├── __init__.py
 │   └── config.py
 ├── routes/
 │   └── main.py
