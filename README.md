@@ -5,7 +5,7 @@ An AI-powered content creation tool built with Flask and OpenAI, supporting mult
 ## Features
 
 - AI-powered content generation
-- Multi-language support (English and Dutch)
+- Multi-language support (English and Nederlands)
 - Simple and intuitive web interface
 - Customizable content templates
 - Easy deployment
@@ -113,6 +113,78 @@ flask run
 - Context-aware responses
 - Format-preserving output
 - Error handling and fallbacks
+- Side-by-side content comparison
+- Iterative improvement process with history tracking
+- Loading states and progress indicators
+
+### User Interface
+- Clean and modern design
+- Responsive layout for all devices
+- Vertical content version comparison
+- Interactive improvement history
+- Real-time content updates
+- Loading spinners and progress indicators
+- Error handling with user feedback
+
+## 🧠 Implementation Guide
+
+Here's a simplified version of how the content generation system is implemented in Flask using OpenAI:
+
+### 🧱 Step-by-step Flow
+
+```python
+# 1. Get original input from user
+user_prompt = request.form["prompt"]
+
+# 2. Run Prompt A — content generator
+content_response = openai.ChatCompletion.create(
+    model="gpt-3.5-turbo",
+    messages=[
+        {"role": "system", "content": "You are an expert content creator on Topic A and Prompt Engineering."},
+        {"role": "user", "content": f"Create a content piece based on: {user_prompt}"}
+    ]
+)
+
+generated_content = content_response["choices"][0]["message"]["content"]
+
+# 3. Run Prompt B — content reviewer
+review_response = openai.ChatCompletion.create(
+    model="gpt-3.5-turbo",
+    messages=[
+        {"role": "system", "content": "You are an AI content reviewer. Check the content for clarity, tone, and completeness."},
+        {"role": "user", "content": f"Review this content: {generated_content}. Give specific suggestions for improvement."}
+    ]
+)
+
+suggestions = review_response["choices"][0]["message"]["content"]
+
+# 4. Send review back to Prompt A — improve the original
+improved_response = openai.ChatCompletion.create(
+    model="gpt-3.5-turbo",
+    messages=[
+        {"role": "system", "content": "You are a helpful AI content editor."},
+        {"role": "user", "content": f"Improve this content using the following feedback:\n\nOriginal:\n{generated_content}\n\nFeedback:\n{suggestions}"}
+    ]
+)
+
+final_content = improved_response["choices"][0]["message"]["content"]
+```
+
+### 🧪 Key Features
+
+- AI feedback loop that mimics human editing
+- Multi-agent workflows inside a Flask API
+- User choice between original and improved versions
+- Improvement process tracking for analytics
+
+### 🧰 Implementation Options
+
+The system can be enhanced with:
+
+- Modular prompt functions for better code organization
+- Frontend toggle for version comparison
+- Analytics dashboard for improvement tracking
+- Custom prompt templates for different content types
 
 ## Development
 
