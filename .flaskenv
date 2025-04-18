@@ -1,0 +1,3 @@
+FLASK_APP=tmz_content_creator:create_app
+FLASK_ENV=development
+FLASK_DEBUG=1 

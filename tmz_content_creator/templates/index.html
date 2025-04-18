@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Meuze AI - Content Creator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <h1>Meuze AI - Content Creator</h1>
+    <form method="post">
+        <textarea name="user_prompt" rows="6" cols="70" placeholder="Enter your content idea or question..."></textarea><br><br>
+        <button type="submit">Generate</button>
+    </form>
+
+    {% if response_text %}
+    <div id="output">
+        <h2>AI Output:</h2>
+        <p>{{ response_text }}</p>
+    </div>
+    {% endif %}
+</body>
+</html>
