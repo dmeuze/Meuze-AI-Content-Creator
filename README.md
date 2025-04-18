@@ -1,13 +1,15 @@
 # Meuze AI Content Creator
 
-An AI-powered content creation tool built with Flask and OpenAI.
+An AI-powered content creation tool built with Flask and OpenAI, supporting multiple languages.
 
 ## Features
 
 - AI-powered content generation
+- Multi-language support (English and Dutch)
 - Simple and intuitive web interface
 - Customizable content templates
 - Easy deployment
+- Session-based language preference
 
 ## Installation
 
@@ -92,6 +94,26 @@ flask run
 
 2. Open your browser and navigate to `http://localhost:5000`
 
+3. Using the application:
+   - Select your preferred language (English or Dutch)
+   - Enter your content prompt
+   - Click "Generate Content"
+   - View and use the generated content
+
+## Features in Detail
+
+### Language Support
+- Switch between English and Dutch content generation
+- Language preference is saved in your session
+- System prompts optimized for each language
+- Natural language processing in both languages
+
+### Content Generation
+- Professional tone and style
+- Context-aware responses
+- Format-preserving output
+- Error handling and fallbacks
+
 ## Development
 
 To run tests:
@@ -107,6 +129,29 @@ black .
 To check code style:
 ```bash
 flake8
+```
+
+## Project Structure
+
+```
+tmz_content_creator/
+├── __init__.py
+├── config/
+│   ├── __init__.py
+│   └── config.py
+├── routes/
+│   └── main.py
+├── services/
+│   ├── __init__.py
+│   ├── content_service.py
+│   └── openai_service.py
+├── static/
+│   └── css/
+│       └── styles.css
+├── templates/
+│   └── index.html
+└── tests/
+    └── check_openai_connection.py
 ```
 
 ## License

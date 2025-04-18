@@ -5,8 +5,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="tmz_content_creator",
-    version="0.1.0",
-    author="Dirk Meuze",
+    version="0.1.1",
+    author="Meuze",
     author_email="dirksmaurits@gmail.com",
     description="An AI-powered content creation tool",
     long_description=long_description,
