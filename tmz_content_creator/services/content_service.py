@@ -21,19 +21,32 @@ class ContentService:
                 3. Tone and style
                 4. Grammar and language use
                 5. Content completeness
+                6. Engagement and impact
+                7. Originality and creativity
                 
-                Provide clear, numbered suggestions that can be directly implemented.""",
+                Provide clear, numbered suggestions that can be directly implemented.
+                Be critical and thorough in your analysis.
+                Focus on making the content more concise and impactful.""",
                 
-                'improve': """You are a professional content editor.
-                Your task is to improve the content based on the provided suggestions.
+                'improve': """You are a professional content editor with expertise in creating compelling content.
+                Your task is to significantly improve the content based on the provided suggestions.
                 
                 Follow these steps:
                 1. Carefully read the original content
-                2. Review each suggestion
-                3. Implement the suggestions while maintaining the original message and tone
-                4. Ensure the improved version addresses all suggestions
+                2. Review each suggestion thoroughly
+                3. Make substantial improvements while maintaining the core message
+                4. Enhance the content by:
+                   - Making it more concise and focused
+                   - Removing redundant information
+                   - Strengthening the main points
+                   - Using more precise language
+                   - Improving the logical flow
+                   - Adding relevant examples or analogies
+                5. Ensure the improved version is noticeably better than the original
                 
-                Return only the improved content, without any explanations or notes."""
+                Return only the improved content, without any explanations or notes.
+                Make sure the improvements are significant and meaningful.
+                Focus on quality over quantity."""
             },
             
             'nl': {
@@ -49,19 +62,32 @@ class ContentService:
                 3. Toon en stijl
                 4. Grammatica en taalgebruik
                 5. Volledigheid van de content
+                6. Betrokkenheid en impact
+                7. Originaliteit en creativiteit
                 
-                Geef duidelijke, genummerde suggesties die direct kunnen worden geïmplementeerd.""",
+                Geef duidelijke, genummerde suggesties die direct kunnen worden geïmplementeerd.
+                Wees kritisch en grondig in je analyse.
+                Focus op het maken van de content bondiger en impactvoller.""",
                 
-                'improve': """Je bent een professionele content editor.
-                Je taak is om de content te verbeteren op basis van de gegeven suggesties.
+                'improve': """Je bent een professionele content editor met expertise in het maken van boeiende content.
+                Je taak is om de content significant te verbeteren op basis van de gegeven suggesties.
                 
                 Volg deze stappen:
                 1. Lees de originele content zorgvuldig
-                2. Bekijk elke suggestie
-                3. Implementeer de suggesties terwijl je de originele boodschap en toon behoudt
-                4. Zorg ervoor dat de verbeterde versie alle suggesties adresseert
+                2. Bekijk elke suggestie grondig
+                3. Maak substantiële verbeteringen terwijl je de kernboodschap behoudt
+                4. Verbeter de content door:
+                   - Het bondiger en gerichter te maken
+                   - Overbodige informatie te verwijderen
+                   - De hoofdpunten te versterken
+                   - Preciezere taal te gebruiken
+                   - De logische flow te verbeteren
+                   - Relevante voorbeelden of analogieën toe te voegen
+                5. Zorg ervoor dat de verbeterde versie merkbaar beter is dan het origineel
                 
-                Geef alleen de verbeterde content terug, zonder uitleg of notities."""
+                Geef alleen de verbeterde content terug, zonder uitleg of notities.
+                Zorg ervoor dat de verbeteringen significant en betekenisvol zijn.
+                Focus op kwaliteit boven kwantiteit."""
             }
         }
 
@@ -73,71 +99,62 @@ class ContentService:
             review_prompt = self.system_prompts[language]["review"]
             improve_prompt = self.system_prompts[language]["improve"]
 
-            # Step 1: Generate initial content
+            # Step 1: Generate initial content or use existing content for improvement
             if not improve_again:
                 original_content = self.openai_service.create_completion(
                     system_prompt=system_prompt,
                     user_prompt=user_prompt
                 )
+            else:
+                original_content = previous_content.get('original', user_prompt)
 
-                # Step 2: Review the content
-                suggestions = self.openai_service.create_completion(
-                    system_prompt=review_prompt,
-                    user_prompt=f"Content to review:\n\n{original_content}"
-                )
+            # Step 2: Review the content
+            review_prompt_text = f"""Content to review:
+{original_content}
 
-                # Step 3: Improve the content
-                improvement_prompt = f"""Original content:
+Previous improvements (if any):
+{history[-1]['improvements'] if history else 'None'}
+
+Please provide specific, actionable suggestions for improvement. Be thorough and critical in your analysis."""
+            
+            suggestions = self.openai_service.create_completion(
+                system_prompt=review_prompt,
+                user_prompt=review_prompt_text
+            )
+
+            # Step 3: Improve the content
+            improvement_prompt_text = f"""Original content:
 {original_content}
 
 Suggestions for improvement:
 {suggestions}
 
-Please improve the content based on these suggestions while maintaining the original message and tone."""
-                
-                improved_content = self.openai_service.create_completion(
-                    system_prompt=improve_prompt,
-                    user_prompt=improvement_prompt
-                )
+Previous improvements (if any):
+{history[-1]['improvements'] if history else 'None'}
 
-                # Create initial history
-                history = [{
-                    "suggestions": suggestions,
-                    "improvements": improved_content,
-                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                }]
+Please significantly improve the content based on these suggestions while maintaining the original message and tone.
+Make sure the improvements are substantial and meaningful. Focus on:
+1. Making the content more engaging and impactful
+2. Improving the structure and flow
+3. Adding more vivid examples or analogies
+4. Strengthening the opening and closing
+5. Using more compelling language
+6. Ensuring clear transitions between ideas"""
+            
+            improved_content = self.openai_service.create_completion(
+                system_prompt=improve_prompt,
+                user_prompt=improvement_prompt_text
+            )
 
-            else:
-                # Use previous content and history for subsequent improvements
-                original_content = previous_content["original"]
-                history = history or []
-                
-                # Review the current content
-                suggestions = self.openai_service.create_completion(
-                    system_prompt=review_prompt,
-                    user_prompt=f"Content to review:\n\n{user_prompt}"
-                )
-
-                # Improve the content
-                improvement_prompt = f"""Original content:
-{user_prompt}
-
-Suggestions for improvement:
-{suggestions}
-
-Please improve the content based on these suggestions while maintaining the original message and tone."""
-                
-                improved_content = self.openai_service.create_completion(
-                    system_prompt=improve_prompt,
-                    user_prompt=improvement_prompt
-                )
-
-                # Add to history
-                history.append({
-                    "suggestions": suggestions,
-                    "improvements": improved_content,
-                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                })
+            # Create or update history
+            if not history:
+                history = []
+            
+            history.append({
+                "suggestions": suggestions,
+                "improvements": improved_content,
+                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            })
 
             return {
                 "original": original_content,

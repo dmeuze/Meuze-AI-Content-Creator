@@ -9,8 +9,23 @@ def index():
     user_prompt = ""
     language = session.get('language', 'en')  # Default to English
     improve_again = request.form.get('improve_again') == 'true'
+    reset = request.form.get('reset') == 'true'
     previous_content = session.get('previous_content')
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
+    # Handle reset
+    if reset:
+        session.pop('previous_content', None)
+        session.pop('improvement_history', None)
+        response_text = ""
+        user_prompt = ""
+        
+        if is_ajax:
+            return jsonify({"status": "reset"})
+        return render_template("index.html", 
+                             response_text=response_text,
+                             user_prompt=user_prompt,
+                             language=language)
 
     if request.method == "POST":
         # Check if this is a language change or content generation
@@ -25,12 +40,11 @@ def index():
             session['language'] = language
             
             # Get improvement history if available
-            history = []
-            if request.form.get('history'):
-                try:
-                    history = json.loads(request.form.get('history'))
-                except json.JSONDecodeError:
-                    pass
+            history = session.get('improvement_history', [])
+            
+            # If this is an improvement request, use the current content as input
+            if improve_again and previous_content:
+                user_prompt = previous_content.get('improved', user_prompt)
             
             # Generate content with improvement history
             response_text = current_app.content_service.create_content(
@@ -41,8 +55,9 @@ def index():
                 history=history
             )
             
-            # Store the current content for potential future improvements
+            # Store the current content and history for potential future improvements
             session['previous_content'] = response_text
+            session['improvement_history'] = response_text.get('history', [])
 
             # If it's an AJAX request, return JSON
             if is_ajax:

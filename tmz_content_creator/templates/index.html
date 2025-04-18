@@ -56,6 +56,9 @@
                     <button type="button" class="btn btn-outline-success ms-2" id="improveAgain">
                         {% if language == 'en' %}Improve Again{% else %}Nogmaals Verbeteren{% endif %}
                     </button>
+                    <button type="button" class="btn btn-outline-danger ms-2" id="resetButton">
+                        {% if language == 'en' %}Reset{% else %}Opnieuw{% endif %}
+                    </button>
                 </div>
                 
                 <div class="content-versions">
@@ -283,6 +286,46 @@
                 // Show generated content
                 loadingContent.classList.add('d-none');
                 generatedContent.classList.remove('d-none');
+            });
+        });
+
+        // Add reset functionality
+        document.getElementById('resetButton').addEventListener('click', function() {
+            const button = this;
+            const form = document.getElementById('contentForm');
+            
+            // Disable the button and show loading state
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> {% if language == "en" %}Resetting...{% else %}Resetten...{% endif %}';
+            
+            // Submit the form with reset flag
+            const formData = new FormData();
+            formData.append('reset', 'true');
+            
+            fetch(window.location.pathname, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Reset the form and content
+                document.getElementById('user_prompt').value = '';
+                document.getElementById('contentContainer').classList.add('d-none');
+                
+                // Reset button state
+                button.disabled = false;
+                button.innerHTML = '{% if language == "en" %}Reset{% else %}Opnieuw{% endif %}';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('{% if language == "en" %}An error occurred while resetting.{% else %}Er is een fout opgetreden bij het resetten.{% endif %}');
+                
+                // Reset button state
+                button.disabled = false;
+                button.innerHTML = '{% if language == "en" %}Reset{% else %}Opnieuw{% endif %}';
             });
         });
     </script>
